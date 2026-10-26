@@ -147,73 +147,138 @@ What you'll learn to do
 - Delete a bucket.
 
 ### Task 0 : download the sample asset files
-```
+```bash
 gcloud storage cp -r gs://qwiklabs-gcp-03-41b3cd18f779-assets/* .
 ```
 
 ### Task 1. Working with buckets and objects
-```
+```bash
 PROJECT_ID=`gcloud config get-value project`
 BUCKET=${PROJECT_ID}-bucket
 ```
-```
+```bash
 Your active configuration is: [cloudshell-3825]
 ```
 
 ### Task 2. Create a bucket
 - Create a bucket and multi-regional storage class:
-```
+```bash
 gcloud storage buckets create --default-storage-class=MULTI_REGIONAL gs://${BUCKET}
 ```
 
 ### Task 3. Upload objects to your bucket
 - Run the following to copy the `endpointslambda` object to your bucket:
-```gcloud storage cp -r endpointslambda gs://${BUCKET}```
+```bash
+gcloud storage cp -r endpointslambda gs://${BUCKET}```
 - In gcloud storage, multi-threaded and multi-processing parallel transfers are enabled automatically for high performance. The -r option allows recursion through directories.
 
 ### Task 4. List objects
-```
+```bash
 gcloud storage ls gs://${BUCKET}/*
 ```
 
 ### Task 5. Sync changes with bucket
 Use the following commands to rename and delete some files:
-```
+```bash
 mv endpointslambda/Apache2_0License.txt endpointslambda/old.txt
 ```
-```
+```bash
 rm endpointslambda/aeflex-endpoints/app.yaml
 ```
 Now synchronize the local changes with the bucket:
-```
+```bash
 gcloud storage rsync --delete-unmatched-destination-objects -r endpointslambda gs://${BUCKET}/endpointslambda
 ```
 In this command, the `--delete-unmatched-destination-objects` option deletes files from the target if they're missing in the source (in this case, it deletes app.yaml from the bucket). The -r option runs the command recursively on directories.
 - To verify that the bucket is now in sync with your local changes, list the files in the bucket again:
-```gcloud storage ls gs://${BUCKET}/*```
+```bash
+gcloud storage ls gs://${BUCKET}/*
+```
 
 ### Task 6. Make objects public
 - To allow public access to all files under the endpointslambda folder in your bucket, execute the following command:
-```
+```bash
 gcloud storage objects update --predefined-acl=publicRead -r gs://${BUCKET}
 ```
 
 ### Task 7. Copy with different storage class
 Next, copy a file with Nearline storage class instead of the bucket's default Multi-regional storage class:
-```
+```bash
 gcloud storage cp --storage-class=NEARLINE ghcn/ghcn_on_bq.ipynb gs://${BUCKET}
 ```
 
 ### Task 8. Check storage classes
 - Run the following to check the storage classes and view other detailed information about the objects in your bucket:
-```
+```bash
 gcloud storage ls -L -r gs://${BUCKET} | more
 ```
 
 ### Task 9. Delete your bucket
 - Before deleting a bucket, you must first delete all objects in the bucket. To delete all objects, execute the following command:
-```gcloud storage rm -r gs://${BUCKET}/*```
+```bash
+gcloud storage rm -r gs://${BUCKET}/*```
 Now delete the bucket:
-```
+```bash
 gcloud storage buckets delete gs://${BUCKET}
+```
+
+
+---
+# CLI Lab qwik
+---
+
+### 1. Create a bucket
+```bash
+gcloud storage buckets create gs://<YOUR-BUCKET-NAME>
+```
+
+### 2. Upload an object into your bucket
+- Download the file
+```bash
+curl https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Ada_Lovelace_portrait.jpg/800px-Ada_Lovelace_portrait.jpg --output ada.jpg
+```
+
+```bash
+gcloud storage cp ada.jpg gs://YOUR-BUCKET-NAME
+```
+
+### 3. Download an object from your bucket
+```bash
+gcloud storage cp -r gs://YOUR-BUCKET-NAME/ada.jpg .
+```
+If successful, the command returns:
+```bash
+Copying gs://YOUR-BUCKET-NAME/ada.jpg...
+/ [1 files][360.1 KiB/2360.1 KiB]
+Operation completed over 1 objects/360.1 KiB.
+```
+
+### 4. Copy an object to a folder in the bucket
+```bash
+gcloud storage cp gs://YOUR-BUCKET-NAME/ada.jpg gs://YOUR-BUCKET-NAME/image-folder/
+```
+
+### 5. List contents of a bucket or folder
+```bash
+gcloud storage ls gs://YOUR-BUCKET-NAME
+```
+
+### 6. List details for an object
+```bash
+gcloud storage ls -l gs://YOUR-BUCKET-NAME/ada.jpg
+```
+
+### 7. Make your object publicly accessible
+```bash
+gcloud storage objects update gs://YOUR-BUCKET-NAME/ada.jpg --add-acl-grant=entity=allUsers,role=READER
+```
+
+### 8. Remove public access
+```bash
+gcloud storage objects update gs://YOUR-BUCKET-NAME/ada.jpg --remove-acl-grant=allUsers
+```
+
+### 9. Delete objects
+```bash
+gcloud storage rm gs://YOUR-BUCKET-NAME/ada.jpg
 ```
